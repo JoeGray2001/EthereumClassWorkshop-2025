@@ -117,15 +117,17 @@ contract StakingContract {
     /**
      * Function that allows users to store Ether in the smart contract
      */
-    function addUser(string memory _name, uint8 _age, Ethnicity ethnicity) public {
+    function addUser(string memory _name, uint8 _age, Ethnicity ethnicity) public payable{
         
-        // TODO: make sure the function can receive ether
         
         // TODO: use require to check if the user sent ether in the calling transaction
+        require(msg.value > 0, "The staking value is 0"); 
 
         // TODO: use require to check if user already exists or not
+        require(users[msg.sender].exists, "User already exists");
 
         // TODO: use require to check if the users are over the set limit
+        require(userAddresses.length < MAX_PEOPLE, string.concat("Users are over the limit of ", Strings.toString(MAX_PEOPLE)));
 
         // TODO: create the user object in memory
 
