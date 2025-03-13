@@ -9,7 +9,7 @@ import "hardhat/console.sol";
 // Contract to demonstrate Solidity basics
 contract StakingContract {
     // Variables
-    address public immutable owner;
+    address public immutable owner; // public is a visibility modifier that makes the variable accessible from outside the contract
 
     enum Ethnicity {
         African,
@@ -32,9 +32,9 @@ contract StakingContract {
             because all possible keys default to their zero value if not explicitly set.
         You can use an additional boolean mapping to track whether a key has been set
      */
-    mapping(address => User) public users;
-    // Array with dynamic size
-    address[] public userAddresses;
+    mapping(address => User) public users; // users is a mapping that stores all user addresses and their corresponding user objects
+    // Array with dynamic size 
+    address[] public userAddresses; // userAddresses is an array that stores all user addresses
 
     // Constants
     // uint256 public constant MAX_PEOPLE = 10;
@@ -119,7 +119,7 @@ contract StakingContract {
      */
     function addUser(string memory _name, uint8 _age, Ethnicity ethnicity) public payable{
         
-        
+
         // TODO: use require to check if the user sent ether in the calling transaction
         require(msg.value > 0, "The staking value is 0"); 
 
@@ -130,12 +130,17 @@ contract StakingContract {
         require(userAddresses.length < MAX_PEOPLE, string.concat("Users are over the limit of ", Strings.toString(MAX_PEOPLE)));
 
         // TODO: create the user object in memory
+        // memory is temporary storage. User is a struct
+        User memory user = User(_name, _age, ethnicity, msg.value, userAddresses.length, true);
 
         // TODO: store the user in the users key value mapping
+        users[msg.sender] = user;
 
         // TODO: store the user address in the userAddresses array
+        userAddresses.push(msg.sender);
 
         // TODO: emit the UserAdded log
+        emit UserAdded(msg.sender, user.name, user.age, user.balance);
     }
 
     // Return many
@@ -149,22 +154,26 @@ contract StakingContract {
      */
     function withdraw() external lock {
         // TODO: get the amount to be withdrawn
+        User memory user = users[msg.sender];
 
         // TODO: use require to check if the user has any money to withdraw
+        require(user.balance > 0, "No balance to withdraw");
 
         // TODO: uncomment below to view print log messages during testing
-        // string memory name = users[msg.sender].name;
-        // console.log(string.concat(name, ' <-> withdrawing '));
+        string memory name = users[msg.sender].name;
+        console.log(string.concat(name, ' <-> withdrawing '));
         
-        // TODO: use the call function on an address object to send Ether to the user
-
+        // TODO: use the call function on an address object to send Ether to the use
+        (bool success, ) = msg.sender.call{value: user.balance}("");
+        
         // TODO: uncomment below to log if withdrawal fails
-        // console.log(success ? "withdrawal successful": "withdrawal failed");
+        console.log(success ? "withdrawal successful": "withdrawal failed");
 
         // TODO: use require to check if the transfer was successful
+        require(success, "Transfer failed");
 
         // TODO: uncomment to call the _delete function
-        // _delete(msg.sender);
+        _delete(msg.sender);
     }
 
     /**
@@ -173,17 +182,23 @@ contract StakingContract {
     function _delete(address userAddress) internal {
         // TODO: uncomment this to check for user existence
         // NOTE: We could have used require, but we can't illustrate the attack because the sm logic would fail after the first recursive withdrawal
-        // if (!users[userAddress].exists){
-        //     return;
-        // }
+        if (!users[userAddress].exists){
+            return;
+        }
         
         // TODO: get the user object into memory
+        User memory user = users[userAddress];
 
         // TODO: delete the user from the users mapping
+        delete users[userAddress];
 
         // TODO: delete the user from users and from the userAddresses array
         // NOTE: first re-locate the address in the last position to the position we are deleting
         // NOTE: second edit the re-located user object's index
+        address lastPositionAddress = userAddresses[userAddresses.length - 1];
+        User storage lastPositionUser = users[lastPositionUserAddress];
+
+        lastPositionUser.index = user.index;
 
         // TODO: use pop() to remove the last element of the userAddresses array
     }
