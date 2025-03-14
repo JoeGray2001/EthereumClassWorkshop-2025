@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract YourCollectible is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     uint256 public tokenIdCounter;
 
-    constructor() ERC721("Bantu", "BT") Ownable(msg.sender) {}
+    constructor() ERC721("Bantu", "BT") Ownable(msg.sender) {} 
 
     function _baseURI() internal pure override returns (string memory) {
         return "https://ipfs.io/ipfs/";
@@ -19,11 +19,14 @@ contract YourCollectible is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable 
         uint256 tokenId = tokenIdCounter;
 
         // TODO: use _mint to create/mint an NFT
+        _safeMint(to, tokenID);
 
         // TODO: use _setTokenURI to set the metadata source for the NFT
+        _setTokenURI(tokenId, uri);
 
         // TODO: increament the tokenIdCounter
-
+        tokenIDCounter += 1;
+        
         return tokenId;
     }
 
